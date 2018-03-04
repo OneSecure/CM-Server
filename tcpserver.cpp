@@ -456,6 +456,7 @@ int TCPServer::InitFd()
     int iRet=bind(m_serverfd,(sockaddr*)&addr,addrlen);
     if(iRet)
     {
+        perror("");
         m_error="bind socket failed!";
         return -1;
     }
@@ -463,6 +464,7 @@ int TCPServer::InitFd()
     iRet=listen(m_serverfd,m_listenNum);
     if(iRet)
     {
+        perror("");
         m_error="listen socket faild!";
         return -1;
     }
@@ -475,6 +477,7 @@ int TCPServer::InitPollMode()
     m_nfds=new pollfd_s[m_maxClients];
     if(m_nfds==NULL)
     {
+        perror("");
         m_error="new pollfd failed";
         return -1;
     }
@@ -488,6 +491,7 @@ int TCPServer::InitEpollMode()
     m_epollid=epoll_create(1);
     if(m_epollid<0)
     {
+        perror("");
         m_error="epoll_create failed";
         return -1;
     }
@@ -498,6 +502,7 @@ int TCPServer::InitEpollMode()
     int iRet=epoll_ctl(m_epollid,EPOLL_CTL_ADD,m_serverfd,&epv);
     if(iRet)
     {
+        perror("");
         m_error="epoll_ctlP_add serverfd failed";
         return -1;
     }
