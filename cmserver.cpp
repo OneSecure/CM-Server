@@ -66,24 +66,18 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
     }
 }
 
-void CMServer::DoWroldTalkMsg(const int& fd)
+void CMServer::DoWroldTalkMsg(const int& fd,WorldTalk_Msg& msg)
 {
     for(auto var:m_playermaps)
     {
         if(var.first!=fd)
         {
-
+            write(var.first,(char*)&msg,sizeof(msg));
         }
     }
 }
 
-void CMServer::DoPrivateTalkMsg(const int& fd)
+void CMServer::DoPrivateTalkMsg(const int& fd,PrivateTalk_Msg& msg)
 {
-    for(auto var:m_playermaps)
-    {
-        if(var.first==fd)
-        {
-
-        }
-    }
+    write(fd,(char*)&msg,sizeof(msg));
 }
