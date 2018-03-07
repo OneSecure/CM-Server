@@ -43,6 +43,34 @@ public:
      * @param fd:leave player fd
      */
     void DoPlayerLeaveMsg(const int& fd);
+
+    /*
+     * deal with player move to msg
+     * @param fd:sender fd
+     * @param msg:sender's msg
+     */
+    void DoPlayerMoveToMsg(const int& fd,MoveTo_Msg* msg);
+
+    /*
+     * deal with player position verify msg
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoPlayerVerifyPosMsg(const int& fd,VerifyPos_Msg* msg);
+
+    /*
+     * deal with update player data msg
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoUpdateDataMsg(const int& fd,UpdateData_Msg* msg);
+
+    /*
+     * deal with player change current map message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoUpdateMapMsg(const int& fd,UpdateMap_Msg* msg);
 private:
     std::map<int,Player_Info> m_playermaps;
 };

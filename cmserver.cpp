@@ -1,5 +1,8 @@
 #include "cmserver.h"
+#include<iostream>
 #include<string.h>
+
+using namespace std;
 
 CMServer::CMServer():
     TCPServer(NULL,NULL,6036,EPOLL_MODE,10)
@@ -18,7 +21,6 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
     {
     case DISCONN_FLAG:
         DoPlayerLeaveMsg(clientfd);
-        perror("PlayerLeave");
         break;
     case NORMAL_FLAG:
     {
@@ -28,31 +30,46 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
         case M_InitData:
         {
             DoInitDataMsg(clientfd,(InitData_Msg*)msg);
-            perror("InitData");
         }
             break;
         case M_WorldTalk:
         {
             DoWroldTalkMsg(clientfd,(WorldTalk_Msg*)msg);
-            perror("worldtalk");
         }
             break;
         case M_PrivateTalk:
         {
             DoPrivateTalkMsg(clientfd,(PrivateTalk_Msg*)msg);
-            perror("privatetalk");
         }
             break;
         case M_InitPos:
         {
             DoInitPosMsg(clientfd,(InitPos_Msg*)msg);
-            perror("InitsPos");
         }
             break;
         case M_PlayerLeave:
         {
             DoPlayerLeaveMsg(clientfd);
-            perror("PlayerLeave");
+        }
+            break;
+        case M_MoveTo:
+        {
+            DoPlayerMoveToMsg(clientfd,(MoveTo_Msg*)msg);
+        }
+            break;
+        case M_VerifyPos:
+        {
+            DoPlayerVerifyPosMsg(clientfd,(VerifyPos_Msg*)msg);
+        }
+            break;
+        case M_UpdateData:
+        {
+            DoUpdateDataMsg(clientfd,(UpdateData_Msg*)msg);
+        }
+            break;
+        case M_UpdateMap:
+        {
+            DoUpdateMapMsg(clientfd,(UpdateMap_Msg*)msg);
         }
             break;
         default:
@@ -91,6 +108,8 @@ void CMServer::DoInitDataMsg(const int& fd,InitData_Msg* rlmsg)
     m_playermaps[fd].mana=rlmsg->mana;
     m_playermaps[fd].attack=rlmsg->attack;
     m_playermaps[fd].defense=rlmsg->defense;
+    m_playermaps[fd].grade=rlmsg->grade;
+    cout<<rlmsg->playername<<":"<<rlmsg->rolename<<" online!"<<endl;
     for(auto var:m_playermaps)
     {
         if(var.first!=fd)
@@ -105,6 +124,7 @@ void CMServer::DoInitDataMsg(const int& fd,InitData_Msg* rlmsg)
            smsg.mana=m_playermaps[var.first].mana;
            smsg.attack=m_playermaps[var.first].attack;
            smsg.defense=m_playermaps[var.first].defense;
+           smsg.grade=m_playermaps[var.first].grade;
            smsg.fd=var.first;
            SendMsg(fd,(char*)&smsg,sizeof(smsg));
            rlmsg->fd=fd;
@@ -117,6 +137,7 @@ void CMServer::DoInitPosMsg(const int& fd,InitPos_Msg* msg)
 {
     m_playermaps[fd].x=msg->x;
     m_playermaps[fd].y=msg->y;
+    cout<<m_playermaps[fd].rolename<<" initialize position("<<msg->x<<","<<msg->y<<")"<<endl;
     for(auto var:m_playermaps)
     {
         if(var.first!=fd)
@@ -135,6 +156,7 @@ void CMServer::DoInitPosMsg(const int& fd,InitPos_Msg* msg)
 
 void CMServer::DoPlayerLeaveMsg(const int& fd)
 {
+    cout<<m_playermaps[fd].rolename<<" off line"<<endl;
     for(auto var:m_playermaps)
     {
         if(var.first!=fd)
@@ -147,3 +169,66 @@ void CMServer::DoPlayerLeaveMsg(const int& fd)
     }
     m_playermaps.erase(fd);
 }
+
+ void CMServer::DoPlayerMoveToMsg(const int& fd,MoveTo_Msg* msg)
+ {
+     cout<<m_playermaps[fd].rolename<<" move to position("<<msg->x<<","<<msg->y<<")"<<endl;
+     for(auto var:m_playermaps)
+     {
+         if(var.first!=fd)
+         {
+             msg->fd=fd;
+             SendMsg(var.first,(char*)msg,sizeof(MoveTo_Msg));
+         }
+     }
+ }
+
+ void CMServer::DoPlayerVerifyPosMsg(const int& fd,VerifyPos_Msg* msg)
+ {
+     cout<<m_playermaps[fd].rolename<<" verify position("<<msg->x<<","<<msg->y<<")"<<endl;
+     for(auto var:m_playermaps)
+     {
+         if(var.first!=fd)
+         {
+             msg->fd=fd;
+             SendMsg(var.first,(char*)msg,sizeof(VerifyPos_Msg));
+         }
+         else
+         {
+             m_playermaps[var.first].x=msg->x;
+             m_playermaps[var.first].y=msg->y;
+         }
+     }
+ }
+
+ void CMServer::DoUpdateDataMsg(const int& fd,UpdateData_Msg* msg)
+ {
+     m_playermaps[fd].attack=msg->attack;
+     m_playermaps[fd].blood=msg->blood;
+     m_playermaps[fd].defense=msg->defense;
+     m_playermaps[fd].grade=msg->grade;
+     m_playermaps[fd].mana=msg->mana;
+     msg->fd=fd;
+     cout<<m_playermaps[fd].rolename<<" update data"<<endl;
+     for(auto var:m_playermaps)
+     {
+         if(var.first!=fd)
+         {
+             SendMsg(var.first,(char*)msg,sizeof(UpdateData_Msg));
+         }
+     }
+ }
+
+ void CMServer::DoUpdateMapMsg(const int& fd,UpdateMap_Msg* msg)
+ {
+     m_playermaps[fd].curmap=msg->curmap;
+     msg->fd=fd;
+     cout<<m_playermaps[fd].rolename<<" update current map"<<endl;
+     for(auto var:m_playermaps)
+     {
+         if(var.first!=fd)
+         {
+             SendMsg(var.first,(char*)msg,sizeof(UpdateMap_Msg));
+         }
+     }
+ }

@@ -1,3 +1,4 @@
+
 #ifndef SHAREDATA_H
 #define SHAREDATA_H
 #include<string>
@@ -10,6 +11,10 @@ enum M_Type
     M_PrivateTalk,    //私聊消息
     M_InitPos,      //初始化位置
     M_PlayerLeave,   //玩家离线
+    M_MoveTo,    //玩家移动到某处
+    M_VerifyPos,   //校验玩家位置
+    M_UpdateData,   //更新玩家信息
+    M_UpdateMap,
 };
 
 struct Player_Info
@@ -24,6 +29,7 @@ struct Player_Info
     std::string playertype;
     float x;
     float y;
+    int grade;
     int fd;
 };
 
@@ -38,6 +44,7 @@ struct InitData_Msg
     float defense;
     int curmap;
     char playertype[10];
+    int grade;
     int fd;
 };
 
@@ -72,6 +79,40 @@ struct PrivateMsg
 {
     int dest;
     std::string msg;
+};
+
+struct MoveTo_Msg
+{
+    M_Type type;
+    float x;
+    float y;
+    int fd;
+};
+
+struct  VerifyPos_Msg
+{
+    M_Type type;
+    float x;
+    float y;
+    int fd;
+};
+
+struct UpdateData_Msg
+{
+    M_Type type;
+    float blood;
+    float mana;
+    float attack;
+    float defense;
+    int grade;
+    int fd;
+};
+
+struct UpdateMap_Msg
+{
+    M_Type type;
+    int fd;
+    int curmap;
 };
 
 #endif // SHAREDATA_H
