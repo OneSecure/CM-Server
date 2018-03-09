@@ -84,18 +84,25 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
 
 void CMServer::DoWroldTalkMsg(const int& fd,WorldTalk_Msg* msg)
 {
+    cout<<m_playermaps[fd].rolename<<" in the world say: "<<msg->msg<<endl;
+    msg->fd=fd;
     for(auto var:m_playermaps)
     {
         if(var.first!=fd)
         {
-            write(var.first,(char*)&msg,sizeof(WorldTalk_Msg));
+            write(var.first,(char*)msg,sizeof(WorldTalk_Msg));
         }
     }
 }
 
 void CMServer::DoPrivateTalkMsg(const int& fd,PrivateTalk_Msg* msg)
 {
-    write(fd,(char*)&msg,sizeof(PrivateTalk_Msg));
+    if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+    {
+        msg->fd=fd;
+        cout<<m_playermaps[fd].rolename<<"say "<<msg->msg<<" to "<<m_playermaps[msg->dest].rolename<<endl;
+        write(msg->dest,(char*)msg,sizeof(PrivateTalk_Msg));
+    }
 }
 
 void CMServer::DoInitDataMsg(const int& fd,InitData_Msg* rlmsg)
