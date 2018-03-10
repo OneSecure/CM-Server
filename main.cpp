@@ -9,7 +9,6 @@ int main()
     CMServer cmserver;
     if(!cmserver.StartServer())
     {
-
         cout<<"start server success!"<<sizeof(int)<<endl;
     }
     else

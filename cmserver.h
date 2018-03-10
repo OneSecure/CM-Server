@@ -71,6 +71,27 @@ public:
      * @param msg:message context
      */
     void DoUpdateMapMsg(const int& fd,UpdateMap_Msg* msg);
+
+    /*
+     * deal with team apply message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void doTeamApplyMsg(const int& fd,TeamApply_Msg* msg);
+
+    /*
+     * deal with refuse team message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoRefuseTeamMsg(const int& fd,RefuseTeam_Msg* msg);
+
+    /*
+     * deal with agree team message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoAgreeTeamMsg(const int& fd,AgreeTeam_Msg* msg);
 private:
     std::map<int,Player_Info> m_playermaps;
 };

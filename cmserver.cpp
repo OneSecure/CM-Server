@@ -72,6 +72,21 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
             DoUpdateMapMsg(clientfd,(UpdateMap_Msg*)msg);
         }
             break;
+        case M_TeamApply:
+        {
+            doTeamApplyMsg(clientfd,(TeamApply_Msg*)msg);
+        }
+            break;
+        case M_RefuseTeam:
+        {
+            DoRefuseTeamMsg(clientfd,(RefuseTeam_Msg*)msg);
+        }
+            break;
+        case M_AgreeTeam:
+        {
+            DoAgreeTeamMsg(clientfd,(AgreeTeam_Msg*)msg);
+        }
+            break;
         default:
             break;
         }
@@ -100,7 +115,7 @@ void CMServer::DoPrivateTalkMsg(const int& fd,PrivateTalk_Msg* msg)
     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
     {
         msg->fd=fd;
-        cout<<m_playermaps[fd].rolename<<"say "<<msg->msg<<" to "<<m_playermaps[msg->dest].rolename<<endl;
+        cout<<m_playermaps[fd].rolename<<" say "<<msg->msg<<" to "<<m_playermaps[msg->dest].rolename<<endl;
         write(msg->dest,(char*)msg,sizeof(PrivateTalk_Msg));
     }
 }
@@ -237,5 +252,36 @@ void CMServer::DoPlayerLeaveMsg(const int& fd)
          {
              SendMsg(var.first,(char*)msg,sizeof(UpdateMap_Msg));
          }
+     }
+ }
+
+ void CMServer::doTeamApplyMsg(const int& fd,TeamApply_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" apply to make a team with "<<m_playermaps[msg->dest].rolename<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(TeamApply_Msg));
+     }
+ }
+
+ void CMServer::DoRefuseTeamMsg(const int& fd,RefuseTeam_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" refused "<<m_playermaps[msg->dest].rolename<<" team apply"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(RefuseTeam_Msg));
+     }
+ }
+
+
+ void CMServer::DoAgreeTeamMsg(const int& fd,AgreeTeam_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" agree "<<m_playermaps[msg->dest].rolename<<" team apply"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(AgreeTeam_Msg));
      }
  }
