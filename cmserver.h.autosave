@@ -99,6 +99,11 @@ public:
      * @param msg:messafe context
      */
     void DoTeamGotoMapMsg(const int& fd,TeamGotoMap_Msg* msg);
+    
+    /*
+     * 
+     */
+    void DoDissolveTeamMsg(const int& fd,TeamManage_Msg* msg);
 private:
     std::map<int,Player_Info> m_playermaps;
 };

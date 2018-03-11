@@ -28,64 +28,46 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
         switch (type)
         {
         case M_InitData:
-        {
             DoInitDataMsg(clientfd,(InitData_Msg*)msg);
-        }
             break;
         case M_WorldTalk:
-        {
             DoWroldTalkMsg(clientfd,(WorldTalk_Msg*)msg);
-        }
             break;
         case M_PrivateTalk:
-        {
             DoPrivateTalkMsg(clientfd,(PrivateTalk_Msg*)msg);
-        }
             break;
         case M_InitPos:
-        {
             DoInitPosMsg(clientfd,(InitPos_Msg*)msg);
-        }
             break;
         case M_PlayerLeave:
-        {
             DoPlayerLeaveMsg(clientfd);
-        }
             break;
         case M_MoveTo:
-        {
             DoPlayerMoveToMsg(clientfd,(MoveTo_Msg*)msg);
-        }
             break;
         case M_VerifyPos:
-        {
             DoPlayerVerifyPosMsg(clientfd,(VerifyPos_Msg*)msg);
-        }
             break;
         case M_UpdateData:
-        {
             DoUpdateDataMsg(clientfd,(UpdateData_Msg*)msg);
-        }
-            break;
-        case M_UpdateMap:
-        {
-            DoUpdateMapMsg(clientfd,(UpdateMap_Msg*)msg);
-        }
             break;
         case M_TeamApply:
-        {
             doTeamApplyMsg(clientfd,(TeamApply_Msg*)msg);
-        }
             break;
         case M_RefuseTeam:
-        {
             DoRefuseTeamMsg(clientfd,(RefuseTeam_Msg*)msg);
-        }
             break;
         case M_AgreeTeam:
-        {
             DoAgreeTeamMsg(clientfd,(AgreeTeam_Msg*)msg);
-        }
+            break;
+        case M_TeamMove:
+            DoTeamMoveMsg(clientfd,(TeamMove_Msg*)msg);
+            break;
+        case M_TeamGotoMap:
+            DoTeamGotoMapMsg(clientfd,(TeamGotoMap_Msg*)msg);
+            break;
+        case M_DissolveTeam:
+
             break;
         default:
             break;
@@ -159,6 +141,7 @@ void CMServer::DoInitPosMsg(const int& fd,InitPos_Msg* msg)
 {
     m_playermaps[fd].x=msg->x;
     m_playermaps[fd].y=msg->y;
+    m_playermaps[fd].curmap=msg->curmap;
     cout<<m_playermaps[fd].rolename<<" initialize position("<<msg->x<<","<<msg->y<<")"<<endl;
     for(auto var:m_playermaps)
     {
@@ -171,6 +154,7 @@ void CMServer::DoInitPosMsg(const int& fd,InitPos_Msg* msg)
             smsg.type=M_InitPos;
             smsg.x=m_playermaps[var.first].x;
             smsg.y=m_playermaps[var.first].y;
+            smsg.curmap=m_playermaps[var.first].curmap;
             SendMsg(fd,(char*)&smsg,sizeof(smsg));
         }
     }
@@ -241,20 +225,6 @@ void CMServer::DoPlayerLeaveMsg(const int& fd)
      }
  }
 
- void CMServer::DoUpdateMapMsg(const int& fd,UpdateMap_Msg* msg)
- {
-     m_playermaps[fd].curmap=msg->curmap;
-     msg->fd=fd;
-     cout<<m_playermaps[fd].rolename<<" update current map"<<endl;
-     for(auto var:m_playermaps)
-     {
-         if(var.first!=fd)
-         {
-             SendMsg(var.first,(char*)msg,sizeof(UpdateMap_Msg));
-         }
-     }
- }
-
  void CMServer::doTeamApplyMsg(const int& fd,TeamApply_Msg* msg)
  {
      msg->fd=fd;
@@ -283,5 +253,34 @@ void CMServer::DoPlayerLeaveMsg(const int& fd)
      {
          cout<<m_playermaps[fd].rolename<<" agree "<<m_playermaps[msg->dest].rolename<<" team apply"<<endl;
          SendMsg(msg->dest,(char*)msg,sizeof(AgreeTeam_Msg));
+     }
+ }
+
+ void CMServer::DoTeamMoveMsg(const int& fd,TeamMove_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" team header move "<<m_playermaps[msg->dest].rolename<<" to ("<<msg->x<<","<<msg->y<<")"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(TeamMove_Msg));
+     }
+ }
+
+ void CMServer::DoTeamGotoMapMsg(const int& fd,TeamGotoMap_Msg* msg)
+ {
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" team header move "<<m_playermaps[msg->dest].rolename<<" to "<<msg->map<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(TeamGotoMap_Msg));
+     }
+ }
+
+ void CMServer::DoDissolveTeamMsg(const int& fd,TeamManage_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<"Dissolve Team "<<m_playermaps[fd].rolename<<" and "<<m_playermaps[msg->dest].rolename<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(TeamManage_Msg));
      }
  }
