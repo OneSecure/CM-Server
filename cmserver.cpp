@@ -67,6 +67,9 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
             DoTeamGotoMapMsg(clientfd,(TeamGotoMap_Msg*)msg);
             break;
         case M_DissolveTeam:
+            DoDissolveTeamMsg(clientfd,(TeamManage_Msg*)msg);
+            break;
+        case M_TeamFight:
 
             break;
         default:

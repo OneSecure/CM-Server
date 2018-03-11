@@ -22,6 +22,7 @@ enum M_Type
     M_DissolveTeam,   //解散队伍
     M_QuitTeam,         //退出队伍
     M_KickOutteam,    //踢出队伍
+    M_TeamFight,   //队伍进入战斗
 };
 
 struct Player_Info
@@ -192,6 +193,15 @@ struct TeamManage_Msg
     M_Type type;
     int fd;
     int dest;
+};
+
+struct TeamFight_Msg
+{
+    M_Type type;
+    char name[20];
+    int fd;
+    int dest;
+    int nums;
 };
 
 #endif // SHAREDATA_H
