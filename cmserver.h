@@ -113,6 +113,20 @@ public:
      * @param msg:message context
      */
     void DoTeamFightMsg(const int& fd,TeamFight_Msg* msg);
+
+    /*
+     * deal with player attack monster message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoPlayerAtkMsg(const int& fd,PlayerAtk_Msg* msg);
+
+    /*
+     * deal with Monster attack player message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoMonsterAtkMsg(const int& fd,MonsterAtk_Msg* msg);
 private:
     std::map<int,Player_Info> m_playermaps;
 };

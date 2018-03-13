@@ -70,7 +70,13 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
             DoDissolveTeamMsg(clientfd,(TeamManage_Msg*)msg);
             break;
         case M_TeamFight:
-
+            DoTeamFightMsg(clientfd,(TeamFight_Msg*)msg);
+            break;
+        case M_PlayerAtk:
+            DoPlayerAtkMsg(clientfd,(PlayerAtk_Msg*)msg);
+            break;
+        case M_MonsterAtk:
+            DoMonsterAtkMsg(clientfd,(MonsterAtk_Msg*)msg);
             break;
         default:
             break;
@@ -285,5 +291,35 @@ void CMServer::DoPlayerLeaveMsg(const int& fd)
      {
          cout<<"Dissolve Team "<<m_playermaps[fd].rolename<<" and "<<m_playermaps[msg->dest].rolename<<endl;
          SendMsg(msg->dest,(char*)msg,sizeof(TeamManage_Msg));
+     }
+ }
+
+ void CMServer::DoTeamFightMsg(const int& fd,TeamFight_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" leader "<<m_playermaps[msg->dest].rolename<<" entry fight"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(TeamFight_Msg));
+     }
+ }
+
+ void CMServer::DoPlayerAtkMsg(const int& fd,PlayerAtk_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" attack monster"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(PlayerAtk_Msg));
+     }
+ }
+
+ void CMServer::DoMonsterAtkMsg(const int& fd,MonsterAtk_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<"monster attack "<<m_playermaps[msg->dest].rolename<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(MonsterAtk_Msg));
      }
  }
