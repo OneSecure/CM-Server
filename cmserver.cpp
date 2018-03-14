@@ -78,6 +78,12 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
         case M_MonsterAtk:
             DoMonsterAtkMsg(clientfd,(MonsterAtk_Msg*)msg);
             break;
+        case M_PlayerRun:
+            DoPlayerRunMsg(clientfd,(PlayerRun_Msg*)msg);
+            break;
+        case M_UseMedication:
+            DoUseMedicationMsg(clientfd,(UseMedication_Msg*)msg);
+            break;
         default:
             break;
         }
@@ -321,5 +327,25 @@ void CMServer::DoPlayerLeaveMsg(const int& fd)
      {
          cout<<"monster attack "<<m_playermaps[msg->dest].rolename<<endl;
          SendMsg(msg->dest,(char*)msg,sizeof(MonsterAtk_Msg));
+     }
+ }
+
+ void CMServer::DoPlayerRunMsg(const int& fd,PlayerRun_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" run away"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(PlayerRun_Msg));
+     }
+ }
+
+ void CMServer::DoUseMedicationMsg(const int& fd,UseMedication_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" use medication!"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(UseMedication_Msg));
      }
  }

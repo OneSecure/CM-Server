@@ -127,6 +127,20 @@ public:
      * @param msg:message context
      */
     void DoMonsterAtkMsg(const int& fd,MonsterAtk_Msg* msg);
+
+    /*
+     * deal with player run away message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoPlayerRunMsg(const int& fd,PlayerRun_Msg* msg);
+
+    /*
+     * deal with use medication message
+     * @param fd:message sender's
+     * @param msg:message context
+     */
+    void DoUseMedicationMsg(const int& fd,UseMedication_Msg* msg);
 private:
     std::map<int,Player_Info> m_playermaps;
 };
