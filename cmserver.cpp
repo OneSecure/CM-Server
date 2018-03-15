@@ -84,6 +84,9 @@ void CMServer::OnRecv(int clientfd, char *msg, int flag)
         case M_UseMedication:
             DoUseMedicationMsg(clientfd,(UseMedication_Msg*)msg);
             break;
+        case M_PlayerDie:
+            DoPlayerDieMsg(clientfd,(PlayerDie_Msg*)msg);
+            break;
         default:
             break;
         }
@@ -347,5 +350,15 @@ void CMServer::DoPlayerLeaveMsg(const int& fd)
      {
          cout<<m_playermaps[fd].rolename<<" use medication!"<<endl;
          SendMsg(msg->dest,(char*)msg,sizeof(UseMedication_Msg));
+     }
+ }
+
+ void CMServer::DoPlayerDieMsg(const int& fd,PlayerDie_Msg* msg)
+ {
+     msg->fd=fd;
+     if(m_playermaps.find(msg->dest)!=m_playermaps.end())
+     {
+         cout<<m_playermaps[fd].rolename<<" die!"<<endl;
+         SendMsg(msg->dest,(char*)msg,sizeof(PlayerDie_Msg));
      }
  }

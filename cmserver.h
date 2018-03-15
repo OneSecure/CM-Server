@@ -141,6 +141,13 @@ public:
      * @param msg:message context
      */
     void DoUseMedicationMsg(const int& fd,UseMedication_Msg* msg);
+
+    /*
+     * deal with player die message
+     * @param fd:message sender's fd
+     * @param msg:message context
+     */
+    void DoPlayerDieMsg(const int& fd,PlayerDie_Msg* msg);
 private:
     std::map<int,Player_Info> m_playermaps;
 };
